@@ -1,130 +1,162 @@
-# functions:
-#   insertAdmins:
-#     handler: handler/admins/handler.insert
-#     events:
-#       - http:
-#           path: v1/admins/insert
-#           method: post
-#           cors: true
+functions:
+  insertAdmins:
+    handler: handler/admins/handler.insert
+    events:
+      - http:
+          path: v1/admins/insert
+          method: post
+          cors: true
 
-#   selectAdmins:
-#     handler: handler/admins/handler.select
-#     events:
-#       - http:
-#           path: v1/admins/select
-#           method: get
-#           cors: true
+  selectAdmins:
+    handler: handler/admins/handler.select
+    events:
+      - http:
+          path: v1/admins/select
+          method: get
+          cors: true
 
-#   updateAdmins:
-#     handler: handler/admins/handler.update
-#     events:
-#       - http:
-#           path: v1/admins/update
-#           method: put
-#           cors: true
+  updateAdmins:
+    handler: handler/admins/handler.update
+    events:
+      - http:
+          path: v1/admins/update
+          method: put
+          cors: true
 
-#   deleteAdmins:
-#     handler: handler/admins/handler.delete
-#     events:
-#       - http:
-#           path: v1/admins/delete
-#           method: delete
-#           cors: true
+  deleteAdmins:
+    handler: handler/admins/handler.delete
+    events:
+      - http:
+          path: v1/admins/delete
+          method: delete
+          cors: true
 
-#  insertUsers:
-#     handler: handler/users/handler.insert
-#     events:
-#       - http:
-#           path: v1/users/insert
-#           method: post
-#           cors: true
+ insertUsers:
+    handler: handler/users/handler.insert
+    events:
+      - http:
+          path: v1/users/insert
+          method: post
+          cors: true
 
-#   selectUsers:
-#     handler: handler/users/handler.select
-#     events:
-#       - http:
-#           path: v1/users/select
-#           method: get
-#           cors: true
+  selectUsers:
+    handler: handler/users/handler.select
+    events:
+      - http:
+          path: v1/users/select
+          method: get
+          cors: true
 
-#   updateUsers:
-#     handler: handler/users/handler.update
-#     events:
-#       - http:
-#           path: v1/users/update
-#           method: put
-#           cors: true
+  updateUsers:
+    handler: handler/users/handler.update
+    events:
+      - http:
+          path: v1/users/update
+          method: put
+          cors: true
 
-#   deleteUsers:
-#     handler: handler/users/handler.delete
-#     events:
-#       - http:
-#           path: v1/users/delete
-#           method: delete
-#           cors: true
+  deleteUsers:
+    handler: handler/users/handler.delete
+    events:
+      - http:
+          path: v1/users/delete
+          method: delete
+          cors: true
 
-#  insertReminders:
-#     handler: handler/reminders/handler.insert
-#     events:
-#       - http:
-#           path: v1/reminders/insert
-#           method: post
-#           cors: true
+ insertReminders:
+    handler: handler/reminders/handler.insert
+    events:
+      - http:
+          path: v1/reminders/insert
+          method: post
+          cors: true
 
-#   selectReminders:
-#     handler: handler/reminders/handler.select
-#     events:
-#       - http:
-#           path: v1/reminders/select
-#           method: get
-#           cors: true
+  selectReminders:
+    handler: handler/reminders/handler.select
+    events:
+      - http:
+          path: v1/reminders/select
+          method: get
+          cors: true
 
-#   updateReminders:
-#     handler: handler/reminders/handler.update
-#     events:
-#       - http:
-#           path: v1/reminders/update
-#           method: put
-#           cors: true
+  updateReminders:
+    handler: handler/reminders/handler.update
+    events:
+      - http:
+          path: v1/reminders/update
+          method: put
+          cors: true
 
-#   deleteReminders:
-#     handler: handler/reminders/handler.delete
-#     events:
-#       - http:
-#           path: v1/reminders/delete
-#           method: delete
-#           cors: true
+  deleteReminders:
+    handler: handler/reminders/handler.delete
+    events:
+      - http:
+          path: v1/reminders/delete
+          method: delete
+          cors: true
 
-#  insertMedicaments:
-#     handler: handler/medicaments/handler.insert
-#     events:
-#       - http:
-#           path: v1/medicaments/insert
-#           method: post
-#           cors: true
+ insertMedicaments:
+    handler: handler/medicaments/handler.insert
+    events:
+      - http:
+          path: v1/medicaments/insert
+          method: post
+          cors: true
 
-#   selectMedicaments:
-#     handler: handler/medicaments/handler.select
-#     events:
-#       - http:
-#           path: v1/medicaments/select
-#           method: get
-#           cors: true
+  selectMedicaments:
+    handler: handler/medicaments/handler.select
+    events:
+      - http:
+          path: v1/medicaments/select
+          method: get
+          cors: true
 
-#   updateMedicaments:
-#     handler: handler/medicaments/handler.update
-#     events:
-#       - http:
-#           path: v1/medicaments/update
-#           method: put
-#           cors: true
+  updateMedicaments:
+    handler: handler/medicaments/handler.update
+    events:
+      - http:
+          path: v1/medicaments/update
+          method: put
+          cors: true
 
-#   deleteMedicaments:
-#     handler: handler/medicaments/handler.delete
-#     events:
-#       - http:
-#           path: v1/medicaments/delete
-#           method: delete
-#           cors: true
+  deleteMedicaments:
+    handler: handler/medicaments/handler.delete
+    events:
+      - http:
+          path: v1/medicaments/delete
+          method: delete
+          cors: true
+
+ insertRecommendations:
+    handler: handler/recommendations/handler.insert
+    events:
+      - http:
+          path: v1/recommendations/insert
+          method: post
+          cors: true
+
+  selectRecommendations:
+    handler: handler/recommendations/handler.select
+    events:
+      - http:
+          path: v1/recommendations/select
+          method: get
+          cors: true
+
+  updateRecommendations:
+    handler: handler/recommendations/handler.update
+    events:
+      - http:
+          path: v1/recommendations/update
+          method: put
+          cors: true
+
+  deleteRecommendations:
+    handler: handler/recommendations/handler.delete
+    events:
+      - http:
+          path: v1/recommendations/delete
+          method: delete
+          cors: true
 
           
