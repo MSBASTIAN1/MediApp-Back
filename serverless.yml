@@ -12,6 +12,7 @@ provider:
     REMINDERS_TABLE: RemindersTable
     USERS_TABLE: UsersTable
     ADMINS_TABLE: AdminsTable
+    RECOMMENDATIONS_TABLE: RecommendationsTable
     AWS_S3_BUCKET_NAME: mediapp # Define tu variable aquí
 
   iamRoleStatements:
