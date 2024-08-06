@@ -111,7 +111,7 @@ functions:
           method: post
           cors: true
 
-  insertMultipleProducts:
+  insertMultipleMedicaments:
     handler: handler/medicaments/handler.insertMultiple
     events:
       - http:

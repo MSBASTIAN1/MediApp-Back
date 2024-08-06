@@ -227,7 +227,7 @@ module.exports.update = async (event) => {
     },
     // Update expression to modify the item's attributes
     UpdateExpression:
-      "SET description = :description, user_id = :user_id, medicament_id = :medicament_id, date = :date, time = :time, frequency = :frequency, quantity = :quantity, image = :image, status = :status",
+      "SET description = :description, user_id = :user_id, medicament_id = :medicament_id, #date = :date, #time = :time, frequency = :frequency, quantity = :quantity, image = :image, #status = :status",
     // Values for the attributes to be set
     ExpressionAttributeValues: {
       ":description": body.description,
@@ -239,6 +239,11 @@ module.exports.update = async (event) => {
       ":quantity": body.quantity,
       ":image": body.image,
       ":status": body.status,
+    },
+    ExpressionAttributeNames: {
+      "#date": "date",
+      "#time": "time",
+      "#status": "status",
     },
     // Condition to ensure the item exists
     ConditionExpression: "attribute_exists(id)",

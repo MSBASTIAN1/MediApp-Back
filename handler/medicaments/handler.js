@@ -344,7 +344,7 @@ module.exports.update = async (event) => {
     await dynamodb.update(params).promise();
     // Create the updated user object to display it later
     const updatedMedicament = {
-      id: id,
+      id: body.id,
       title: body.title,
       description: body.description,
       first_effects: body.first_effects,
