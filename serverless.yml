@@ -33,7 +33,7 @@ provider:
         - "arn:aws:dynamodb:${self:provider.region}:*:table/*"
         - "arn:aws:s3:::${self:provider.environment.AWS_S3_BUCKET_NAME}/*"
 
-# functions: ${file(./functions.yml):functions}
+functions: ${file(./functions.yml):functions}
 
 resources:
   Resources: ${file(./resources.yml):resources}

@@ -7,6 +7,159 @@ const dynamodb = new AWS.DynamoDB.DocumentClient({
   region: process.env.REGION,
 });
 
+const s3 = new AWS.S3();
+
+// Function for upload image to S3
+const uploadImageToS3 = async (file, fileName, fileType) => {
+  const params = {
+    Bucket: process.env.AWS_S3_BUCKET_NAME,
+    Key: `images/${Date.now()}_${fileName}`,
+    Body: Buffer.from(file, "base64"),
+    ContentType: fileType,
+  };
+
+  try {
+    const uploadResult = await s3.upload(params).promise();
+    return uploadResult.Location;
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    throw error;
+  }
+};
+
+// Endpoint for upload image
+module.exports.uploadImage = async (event) => {
+  const { file, fileName, fileType } = JSON.parse(event.body);
+
+  try {
+    const url = await uploadImageToS3(file, fileName, fileType);
+    return {
+      statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": true,
+      },
+      body: JSON.stringify({ url }),
+    };
+  } catch (error) {
+    return {
+      statusCode: 500,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": true,
+      },
+      body: JSON.stringify({
+        error: "Error uploading file",
+        details: error.message,
+      }),
+    };
+  }
+};
+
+// Insert multiple medicaments
+module.exports.insertMultiple = async (event) => {
+  console.log("insertMultipleMedicaments", event);
+
+  if (!event.body) {
+    return {
+      statusCode: 400,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": true,
+      },
+      body: JSON.stringify(
+        { message: "Error: The request body is empty." },
+        null,
+        2
+      ),
+    };
+  }
+
+  const body = JSON.parse(event.body);
+
+  if (!Array.isArray(body.medicaments) || body.medicaments.length === 0) {
+    return {
+      statusCode: 400,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": true,
+      },
+      body: JSON.stringify(
+        {
+          message: "Error: The request body must contain an array of products.",
+        },
+        null,
+        2
+      ),
+    };
+  }
+
+  const medicaments = body.medicaments.map((medicament) => {
+    if (
+      !medicament.title ||
+      !medicament.description ||
+      !medicament.first_effects ||
+      !medicament.side_effects ||
+      !medicament.recommended_dose ||
+      !medicament.image
+    ) {
+      throw new Error(
+        "Error: One or more products do not contain the expected data."
+      );
+    }
+
+    return {
+      PutRequest: {
+        Item: {
+          id: uuidv4(),
+          name: medicament.title,
+          description: medicament.description,
+          category_id: medicament.first_effects,
+          price: medicament.side_effects,
+          stock: medicament.recommended_dose,
+          image: medicament.image,
+        },
+      },
+    };
+  });
+
+  const params = {
+    RequestItems: {
+      [process.env.MEDICAMENTS_TABLE]: medicaments,
+    },
+  };
+
+  try {
+    await dynamodb.batchWrite(params).promise();
+    return {
+      statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": true,
+      },
+      body: JSON.stringify(
+        { message: "Inserted Successfully", data: body.medicaments },
+        null,
+        2
+      ),
+    };
+  } catch (error) {
+    console.error("Error inserting data", error);
+    return {
+      statusCode: 500,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": true,
+      },
+      body: JSON.stringify(
+        { message: "Error inserting data", error: error.message },
+        null,
+        2
+      ),
+    };
+  }
+};
+
 // Insert
 module.exports.insert = async (event) => {
   console.log("insert", event);
@@ -38,6 +191,7 @@ module.exports.insert = async (event) => {
     !body.description ||
     !body.first_effects ||
     !body.side_effects ||
+    !body.image ||
     !body.recommended_dose
   ) {
     return {
@@ -63,6 +217,7 @@ module.exports.insert = async (event) => {
     description: body.description,
     first_effects: body.first_effects,
     side_effects: body.side_effects,
+    image: body.image,
     recommended_dose: body.recommended_dose,
   };
 
@@ -170,13 +325,14 @@ module.exports.update = async (event) => {
     },
     // Update expression to modify the item's attributes
     UpdateExpression:
-      "SET title = :title, description = :description, first_effects = :first_effects, side_effects = :side_effects, recommended_dose = :recommended_dose",
+      "SET title = :title, description = :description, first_effects = :first_effects, side_effects = :side_effects, image = :image, recommended_dose = :recommended_dose",
     // Values for the attributes to be set
     ExpressionAttributeValues: {
       ":title": body.title,
       ":description": body.description,
       ":first_effects": body.first_effects,
       ":side_effects": body.side_effects,
+      ":image": body.image,
       ":recommended_dose": body.recommended_dose,
     },
     // Condition to ensure the item exists
@@ -193,6 +349,7 @@ module.exports.update = async (event) => {
       description: body.description,
       first_effects: body.first_effects,
       side_effects: body.side_effects,
+      image: body.image,
       recommended_dose: body.recommended_dose,
     };
 

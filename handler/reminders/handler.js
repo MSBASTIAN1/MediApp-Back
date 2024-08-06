@@ -7,6 +7,55 @@ const dynamodb = new AWS.DynamoDB.DocumentClient({
   region: process.env.REGION,
 });
 
+const s3 = new AWS.S3();
+
+// Function for upload image to S3
+const uploadImageToS3 = async (file, fileName, fileType) => {
+  const params = {
+    Bucket: process.env.AWS_S3_BUCKET_NAME,
+    Key: `images/${Date.now()}_${fileName}`,
+    Body: Buffer.from(file, "base64"),
+    ContentType: fileType,
+  };
+
+  try {
+    const uploadResult = await s3.upload(params).promise();
+    return uploadResult.Location;
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    throw error;
+  }
+};
+
+// Endpoint for upload image
+module.exports.uploadImage = async (event) => {
+  const { file, fileName, fileType } = JSON.parse(event.body);
+
+  try {
+    const url = await uploadImageToS3(file, fileName, fileType);
+    return {
+      statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": true,
+      },
+      body: JSON.stringify({ url }),
+    };
+  } catch (error) {
+    return {
+      statusCode: 500,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": true,
+      },
+      body: JSON.stringify({
+        error: "Error uploading file",
+        details: error.message,
+      }),
+    };
+  }
+};
+
 // Insert
 module.exports.insert = async (event) => {
   console.log("insert", event);
@@ -34,11 +83,15 @@ module.exports.insert = async (event) => {
 
   // Check if body contains the expected data
   if (
-    !body.title ||
     !body.description ||
-    !body.time ||
+    !body.user_id ||
     !body.medicament_id ||
-    !body.stock
+    !body.date ||
+    !body.time ||
+    !body.frequency ||
+    !body.quantity ||
+    !body.image ||
+    !body.status
   ) {
     return {
       statusCode: 400,
@@ -57,18 +110,22 @@ module.exports.insert = async (event) => {
     };
   }
 
-  const reminders = {
+  const reminder = {
     id: id,
-    title: body.title,
     description: body.description,
-    time: body.time,
+    user_id: body.user_id,
     medicament_id: body.medicament_id,
-    stock: body.stock,
+    date: body.date,
+    time: body.time,
+    frequency: body.frequency,
+    quantity: body.quantity,
+    image: body.image,
+    status: body.status,
   };
 
   const params = {
     TableName: process.env.REMINDERS_TABLE,
-    Item: reminders,
+    Item: reminder,
   };
 
   try {
@@ -82,7 +139,7 @@ module.exports.insert = async (event) => {
       body: JSON.stringify(
         {
           message: "Inserted Successfully",
-          data: reminders,
+          data: reminder,
         },
         null,
         2
@@ -170,14 +227,18 @@ module.exports.update = async (event) => {
     },
     // Update expression to modify the item's attributes
     UpdateExpression:
-      "SET title = :title, description = :description, time = :time , medicament_id = :medicament_id, stock = :stock",
+      "SET description = :description, user_id = :user_id, medicament_id = :medicament_id, date = :date, time = :time, frequency = :frequency, quantity = :quantity, image = :image, status = :status",
     // Values for the attributes to be set
     ExpressionAttributeValues: {
-      ":title": body.title,
       ":description": body.description,
-      ":time": body.time,
+      ":user_id": body.user_id,
       ":medicament_id": body.medicament_id,
-      ":stock": body.stock,
+      ":date": body.date,
+      ":time": body.time,
+      ":frequency": body.frequency,
+      ":quantity": body.quantity,
+      ":image": body.image,
+      ":status": body.status,
     },
     // Condition to ensure the item exists
     ConditionExpression: "attribute_exists(id)",
@@ -186,14 +247,17 @@ module.exports.update = async (event) => {
   try {
     // Execute the update operation and wait for it to complete
     await dynamodb.update(params).promise();
-    // Create the updated user object to display it later
+    // Create the updated reminder object to display it later
     const updatedReminder = {
-      id: id,
-      title: body.title,
+      id: body.id,
       description: body.description,
-      time: body.time,
+      user_id: body.user_id,
       medicament_id: body.medicament_id,
-      stock: body.stock,
+      date: body.date,
+      time: body.time,
+      frequency: body.frequency,
+      quantity: body.quantity,
+      status: body.status,
     };
 
     return {

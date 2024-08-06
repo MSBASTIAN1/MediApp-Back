@@ -31,7 +31,7 @@ functions:
           method: delete
           cors: true
 
- insertUsers:
+  insertUsers:
     handler: handler/users/handler.insert
     events:
       - http:
@@ -63,7 +63,7 @@ functions:
           method: delete
           cors: true
 
- insertReminders:
+  insertReminders:
     handler: handler/reminders/handler.insert
     events:
       - http:
@@ -95,11 +95,27 @@ functions:
           method: delete
           cors: true
 
- insertMedicaments:
+  uploadImageReminder:
+    handler: handler/reminders/handler.uploadImage
+    events:
+      - http:
+          path: v1/reminder/upload
+          method: post
+          cors: true
+
+  insertMedicaments:
     handler: handler/medicaments/handler.insert
     events:
       - http:
           path: v1/medicaments/insert
+          method: post
+          cors: true
+
+  insertMultipleProducts:
+    handler: handler/medicaments/handler.insertMultiple
+    events:
+      - http:
+          path: v1/medicaments/insertMultiple
           method: post
           cors: true
 
@@ -127,7 +143,15 @@ functions:
           method: delete
           cors: true
 
- insertRecommendations:
+  uploadImage:
+    handler: handler/medicaments/handler.uploadImage
+    events:
+      - http:
+          path: v1/medicaments/upload
+          method: post
+          cors: true
+
+  insertRecommendations:
     handler: handler/recommendations/handler.insert
     events:
       - http:
@@ -158,5 +182,3 @@ functions:
           path: v1/recommendations/delete
           method: delete
           cors: true
-
-          
