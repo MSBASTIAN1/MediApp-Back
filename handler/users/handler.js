@@ -38,7 +38,6 @@ module.exports.insert = async (event) => {
     !body.last_name ||
     !body.email ||
     !body.password ||
-    !body.address ||
     !body.phone_number
   ) {
     return {
@@ -64,7 +63,6 @@ module.exports.insert = async (event) => {
     last_name: body.last_name,
     email: body.email,
     password: body.password,
-    address: body.address,
     phone_number: body.phone_number,
   };
 
@@ -172,13 +170,12 @@ module.exports.update = async (event) => {
     },
     // Update expression to modify the item's attributes
     UpdateExpression:
-      "SET first_name = :first_name, last_name = :last_name, password = :password , address = :address, email = :email, phone_number = :phone_number",
+      "SET first_name = :first_name, last_name = :last_name, password = :password , email = :email, phone_number = :phone_number",
     // Values for the attributes to be set
     ExpressionAttributeValues: {
       ":first_name": body.first_name,
       ":last_name": body.last_name,
       ":password": body.password,
-      ":address": body.address,
       ":email": body.email,
       ":phone_number": body.phone_number,
     },
@@ -195,7 +192,6 @@ module.exports.update = async (event) => {
       first_name: body.first_name,
       last_name: body.last_name,
       password: body.password,
-      address: body.address,
       email: body.email,
       phone_number: body.phone_number,
     };
