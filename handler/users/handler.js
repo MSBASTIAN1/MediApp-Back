@@ -330,3 +330,141 @@ module.exports.delete = async (event) => {
     };
   }
 };
+
+// Authenticate
+module.exports.authenticate = async (event) => {
+  console.log("authenticate", event);
+
+  // Check if event.body is defined and not null
+  if (!event.body) {
+    return {
+      statusCode: 400,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": true,
+      },
+      body: JSON.stringify(
+        {
+          message: "Error: The request body is empty.",
+        },
+        null,
+        2
+      ),
+    };
+  }
+
+  // Parse the request body to get the email and password
+  const body = JSON.parse(event.body);
+  const { email, password } = body;
+
+  // Check if email and password are provided
+  if (!email || !password) {
+    return {
+      statusCode: 400,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": true,
+      },
+      body: JSON.stringify(
+        {
+          message: "Error: Both email and password are required.",
+        },
+        null,
+        2
+      ),
+    };
+  }
+
+  // Define the parameters for the DynamoDB scan operation
+  const params = {
+    TableName: process.env.USERS_TABLE,
+    FilterExpression: "email = :email",
+    ExpressionAttributeValues: {
+      ":email": email,
+    },
+  };
+
+  try {
+    // Execute the scan operation to find the user by email
+    const result = await dynamodb.scan(params).promise();
+
+    // Check if a user with the provided email exists
+    if (result.Items.length === 0) {
+      return {
+        statusCode: 400,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Credentials": true,
+        },
+        body: JSON.stringify(
+          {
+            message: "Error: Invalid email or password.",
+          },
+          null,
+          2
+        ),
+      };
+    }
+
+    // Get the user object
+    const user = result.Items[0];
+
+    // Check if the provided password matches the stored password
+    if (user.password !== password) {
+      return {
+        statusCode: 400,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Credentials": true,
+        },
+        body: JSON.stringify(
+          {
+            message: "Error: Invalid email or password.",
+          },
+          null,
+          2
+        ),
+      };
+    }
+
+    // If authentication is successful
+    return {
+      statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": true,
+      },
+      body: JSON.stringify(
+        {
+          message: "Authentication successful",
+          user: {
+            id: user.id,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            email: user.email,
+            phone_number: user.phone_number,
+          },
+        },
+        null,
+        2
+      ),
+    };
+  } catch (error) {
+    console.error("Error authenticating user", error);
+    return {
+      statusCode: 500,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": true,
+      },
+      body: JSON.stringify(
+        {
+          message: "Error authenticating user",
+          error: error.message,
+        },
+        null,
+        2
+      ),
+    };
+  }
+};

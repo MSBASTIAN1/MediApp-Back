@@ -1,4 +1,12 @@
 functions:
+  postAdminsAuth:
+    handler: handler/admins/handler.authenticate
+    events:
+      - http:
+          path: v1/admins/authenticate
+          method: post
+          cors: true
+
   insertAdmins:
     handler: handler/admins/handler.insert
     events:
@@ -36,6 +44,14 @@ functions:
     events:
       - http:
           path: v1/users/insert
+          method: post
+          cors: true
+
+  postUsersAuth:
+    handler: handler/users/handler.authenticate
+    events:
+      - http:
+          path: v1/users/authenticate
           method: post
           cors: true
 
