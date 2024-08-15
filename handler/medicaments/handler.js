@@ -112,11 +112,11 @@ module.exports.insertMultiple = async (event) => {
       PutRequest: {
         Item: {
           id: uuidv4(),
-          name: medicament.title,
+          title: medicament.title,
           description: medicament.description,
-          category_id: medicament.first_effects,
-          price: medicament.side_effects,
-          stock: medicament.recommended_dose,
+          first_effects: medicament.first_effects,
+          side_effects: medicament.side_effects,
+          recommended_dose: medicament.recommended_dose,
           image: medicament.image,
         },
       },

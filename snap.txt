@@ -1,0 +1,98 @@
+{
+  "MediApp": {
+    "Users": [
+      {
+        "id": 1,
+        "first_name": "User 1",
+        "last_name": "Last Name 1",
+        "email": "user1@example.com",
+        "password": "password1",
+        "phone_number": "+123456789"
+      },
+      {
+        "id": 2,
+        "first_name": "User 2",
+        "last_name": "Last Name 2",
+        "email": "user2@example.com",
+        "password": "password2",
+        "phone_number": "+987654321"
+      }
+    ],
+    "Admins": [
+      {
+        "id": 1,
+        "first_name": "Admin 1",
+        "last_name": "Last Name 1",
+        "email": "admin1@example.com",
+        "password": "adminpassword1"
+      },
+      {
+        "id": 2,
+        "first_name": "Admin 2",
+        "last_name": "Last Name 2",
+        "email": "admin2@example.com",
+        "password": "adminpassword2"
+      }
+    ],
+    "Medicaments": [
+      {
+        "id": "1",
+        "title": "Medicament 1",
+        "description": "Description of Medicament 1",
+        "first_effects": "First effects of Medicament 1",
+        "side_effects": "Side effects of Medicament 1",
+        "image": "imageurl",
+        "recommended_dose": "Recommended dose of Medicament 1"
+      },
+      {
+        "id": "2",
+        "title": "Medicament 2",
+        "description": "Description of Medicament 2",
+        "first_effects": "First effects of Medicament 2",
+        "side_effects": "Side effects of Medicament 2",
+        "image": "imageurl",
+        "recommended_dose": "Recommended dose of Medicament 2"
+      }
+    ],
+    "Reminders": [
+      {
+        "id": "1",
+        "user_id": "1",
+        "medicament_id": "1",
+        "description": "Reminder 1",
+        "date": "2024-08-05",
+        "time": "10:00:00",
+        "frequency": "daily",
+        "quantity": "1 tablet of 500 gr",
+        "image": "imageurl",
+        "status": "active"
+      },
+      {
+        "id": "2",
+        "user_id": "2",
+        "medicament_id": "2",
+        "description": "Reminder 2",
+        "date": "2024-08-06",
+        "time": "11:00:00",
+        "frequency": "weekly",
+        "quantity": "2 tablespoons",
+        "image": "imageurl",
+        "status": "active"
+      }
+    ],
+    "Recommendations": [
+      {
+        "id": "1",
+        "description": "Recommendation 1",
+        "user_id": "1",
+        "email": "user1@example.com"
+      },
+      {
+        "id": "2",
+        "description": "Recommendation 2",
+        "user_id": "2",
+        "email": "user2@example.com"
+      }
+    ]
+  }
+}

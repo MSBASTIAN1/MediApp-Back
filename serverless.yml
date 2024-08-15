@@ -13,7 +13,7 @@ provider:
     USERS_TABLE: UsersTable
     ADMINS_TABLE: AdminsTable
     RECOMMENDATIONS_TABLE: RecommendationsTable
-    AWS_S3_BUCKET_NAME: mediapp # Define tu variable aquí
+    AWS_S3_BUCKET_NAME: mediapp 
 
   iamRoleStatements:
     - Effect: "Allow"
@@ -22,15 +22,18 @@ provider:
         - "dynamodb:PutItem"
         - "dynamodb:UpdateItem"
         - "dynamodb:DeleteItem"
+        - "dynamodb:Query" 
         - "dynamodb:Scan"
         - "dynamodb:BatchWriteItem"
         - "s3:PutObject"
         - "s3:GetObject"
         - "s3:DeleteObject"
 
+
       ## Permissions to all tables in the region
       Resource:
         - "arn:aws:dynamodb:${self:provider.region}:*:table/*"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/*/index/*"
         - "arn:aws:s3:::${self:provider.environment.AWS_S3_BUCKET_NAME}/*"
 
 functions: ${file(./functions.yml):functions}

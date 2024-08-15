@@ -9,53 +9,6 @@ const dynamodb = new AWS.DynamoDB.DocumentClient({
 
 const s3 = new AWS.S3();
 
-// Function for upload image to S3
-const uploadImageToS3 = async (file, fileName, fileType) => {
-  const params = {
-    Bucket: process.env.AWS_S3_BUCKET_NAME,
-    Key: `images/${Date.now()}_${fileName}`,
-    Body: Buffer.from(file, "base64"),
-    ContentType: fileType,
-  };
-
-  try {
-    const uploadResult = await s3.upload(params).promise();
-    return uploadResult.Location;
-  } catch (error) {
-    console.error("Error uploading file:", error);
-    throw error;
-  }
-};
-
-// Endpoint for upload image
-module.exports.uploadImage = async (event) => {
-  const { file, fileName, fileType } = JSON.parse(event.body);
-
-  try {
-    const url = await uploadImageToS3(file, fileName, fileType);
-    return {
-      statusCode: 200,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Credentials": true,
-      },
-      body: JSON.stringify({ url }),
-    };
-  } catch (error) {
-    return {
-      statusCode: 500,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Credentials": true,
-      },
-      body: JSON.stringify({
-        error: "Error uploading file",
-        details: error.message,
-      }),
-    };
-  }
-};
-
 // Insert
 module.exports.insert = async (event) => {
   console.log("insert", event);
@@ -90,7 +43,6 @@ module.exports.insert = async (event) => {
     !body.time ||
     !body.frequency ||
     !body.quantity ||
-    !body.image ||
     !body.status
   ) {
     return {
@@ -119,7 +71,6 @@ module.exports.insert = async (event) => {
     time: body.time,
     frequency: body.frequency,
     quantity: body.quantity,
-    image: body.image,
     status: body.status,
   };
 
@@ -164,6 +115,80 @@ module.exports.insert = async (event) => {
     };
   }
 };
+
+// Select by user_id
+module.exports.selectByUserId = async (event) => {
+  console.log("selectByUserId", event);
+
+  // Obtener el user_id desde los parámetros de la consulta
+  const userId = event.queryStringParameters && event.queryStringParameters.user_id;
+
+  if (!userId) {
+    return {
+      statusCode: 400,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": true,
+      },
+      body: JSON.stringify(
+        {
+          message: "Error: user_id is required as a query parameter.",
+        },
+        null,
+        2
+      ),
+    };
+  }
+
+  // Definir los parámetros para la consulta en DynamoDB
+  const params = {
+    TableName: process.env.REMINDERS_TABLE,
+    IndexName: "UserIdIndex", // índice secundario global en la tabla para user_id
+    KeyConditionExpression: "user_id = :user_id",
+    ExpressionAttributeValues: {
+      ":user_id": userId,
+    },
+  };
+
+  try {
+    // Ejecutar la consulta y esperar a que se complete
+    const result = await dynamodb.query(params).promise();
+    return {
+      statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": true,
+      },
+      body: JSON.stringify(
+        {
+          message: "Data selected by user_id",
+          result: result.Items, // result.Items contiene los datos consultados
+        },
+        null,
+        2
+      ),
+    };
+  } catch (error) {
+    console.error("Error selecting data by user_id", error);
+    return {
+      statusCode: 500,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": true,
+      },
+      body: JSON.stringify(
+        {
+          message: "Error selecting data by user_id",
+          error: error.message,
+        },
+        null,
+        2
+      ),
+    };
+  }
+};
+
+
 
 // Select
 module.exports.select = async (event) => {
@@ -227,7 +252,7 @@ module.exports.update = async (event) => {
     },
     // Update expression to modify the item's attributes
     UpdateExpression:
-      "SET description = :description, user_id = :user_id, medicament_id = :medicament_id, #date = :date, #time = :time, frequency = :frequency, quantity = :quantity, image = :image, #status = :status",
+      "SET description = :description, user_id = :user_id, medicament_id = :medicament_id, #date = :date, #time = :time, frequency = :frequency, quantity = :quantity, #status = :status",
     // Values for the attributes to be set
     ExpressionAttributeValues: {
       ":description": body.description,
@@ -237,7 +262,6 @@ module.exports.update = async (event) => {
       ":time": body.time,
       ":frequency": body.frequency,
       ":quantity": body.quantity,
-      ":image": body.image,
       ":status": body.status,
     },
     ExpressionAttributeNames: {
@@ -320,31 +344,33 @@ module.exports.update = async (event) => {
 // Delete
 module.exports.delete = async (event) => {
   console.log("delete", event);
-  // Parse the request body to get the data provided by the client
-  const body = JSON.parse(event.body);
+  
+  // Obtener el id desde los parámetros del path
+  const { id } = event.pathParameters;
 
-  // Define the parameters to get the item before deleting it
+  // Definir los parámetros para obtener el ítem antes de eliminarlo
   const getParams = {
     TableName: process.env.REMINDERS_TABLE,
     Key: {
-      id: body.id,
+      id: id,
     },
   };
 
-  // Define the parameters for the DynamoDB delete operation
+  // Definir los parámetros para la operación de eliminación en DynamoDB
   const deleteParams = {
     TableName: process.env.REMINDERS_TABLE,
     Key: {
-      id: body.id,
+      id: id,
     },
     ConditionExpression: "attribute_exists(id)",
   };
 
   try {
-    // Get the item before deleting it
+    // Obtener el ítem antes de eliminarlo
     const result = await dynamodb.get(getParams).promise();
     const reminderToDelete = result.Item;
-    // Check if the item exists
+
+    // Verificar si el ítem existe
     if (!reminderToDelete) {
       return {
         statusCode: 400,
@@ -362,9 +388,10 @@ module.exports.delete = async (event) => {
       };
     }
 
-    // Execute the delete operation and wait for it to complete
+    // Ejecutar la operación de eliminación
     await dynamodb.delete(deleteParams).promise();
-    // Return a response with the deleted item's data
+
+    // Retornar una respuesta con los datos del ítem eliminado
     return {
       statusCode: 200,
       headers: {
@@ -377,7 +404,7 @@ module.exports.delete = async (event) => {
           data: reminderToDelete,
         },
         null,
-        2
+          2
       ),
     };
   } catch (error) {

@@ -95,6 +95,18 @@ functions:
           method: get
           cors: true
 
+  selectByUserId:
+    handler: handler/reminders/handler.selectByUserId
+    events:
+      - http:
+          path: v1/reminders/selectId
+          method: get
+          cors: true
+          request:
+            parameters:
+              querystrings:
+                user_id: true
+
   updateReminders:
     handler: handler/reminders/handler.update
     events:
@@ -107,7 +119,7 @@ functions:
     handler: handler/reminders/handler.delete
     events:
       - http:
-          path: v1/reminders/delete
+          path: v1/reminders/delete/{id} # Incluir el parámetro {id} en el path
           method: delete
           cors: true
 
@@ -197,4 +209,3 @@ functions:
       - http:
           path: v1/recommendations/delete
           method: delete
-          cors: true
