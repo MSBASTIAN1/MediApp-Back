@@ -21,7 +21,7 @@ module.exports.insert = async (event) => {
       },
       body: JSON.stringify(
         {
-          message: "Error: The request body is empty.",
+          message: "Error: The request body empty.",
         },
         null,
         2
